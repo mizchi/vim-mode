@@ -566,11 +566,13 @@ class MoveToStartOfFile extends MoveToLine
     if @isLinewise() then column else column + 1
 
   select: (count=1) ->
-    {row, column} = @editor.getCursorBufferPosition()
+    [{start}] = this.editor.getSelectedBufferRanges()
+    {row, column} = start
+
     startingCol = @getStartingColumn(column)
     destinationRow = @getDestinationRow(count)
     destinationCol = @getDestinationColumn(destinationRow)
-    bufferRange = new Range([row, startingCol], [destinationRow, destinationCol])
+    bufferRange = new Range([row, column], [destinationRow, destinationCol])
     @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
 class MoveToTopOfScreen extends MoveToScreenLine

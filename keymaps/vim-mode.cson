@@ -216,3 +216,4 @@
   'x': 'vim-mode:delete'
   's': 'vim-mode:change'
   'G': 'vim-mode:move-to-line'
+  'g g': 'vim-mode:move-to-start-of-file'
