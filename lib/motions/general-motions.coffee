@@ -442,6 +442,10 @@ class MoveToLine extends Motion
     else
       start = row
       end = count - 1
+
+    if this.vimState.submode is 'linewise'
+      start--
+
     @editor.setSelectedBufferRange(@selectRows(start, end, {requireEOL}))
 
     _.times count, ->
