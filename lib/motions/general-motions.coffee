@@ -435,18 +435,20 @@ class MoveToLine extends Motion
   # Options
   #  requireEOL - if true, ensure an end of line character is always selected
   select: (count=@editor.getLineCount(), {requireEOL}={}) ->
-    {row, column} = @editor.getCursorBufferPosition()
-    if row >= count
-      start = count - 1
-      end = row
-    else
-      start = row
-      end = count - 1
+    [{start, end}] = this.editor.getSelectedBufferRanges()
+    currentPos = @editor.getCursorBufferPosition()
+    {row, column} =
+      if start.row is currentPos.row and start.column is currentPos.column
+        end
+      else
+        start
 
-    if this.vimState.submode is 'linewise'
-      start--
+    buffer = @editor.getBuffer()
+    lastRow = buffer.getLastRow()
+    lastColumn = buffer.lineForRow(lastRow-1).length - 1
 
-    @editor.setSelectedBufferRange(@selectRows(start, end, {requireEOL}))
+    bufferRange = new Range([row, column], [lastRow, lastColumn])
+    @editor.setSelectedBufferRange(bufferRange, reversed: false)
 
     _.times count, ->
       true
@@ -566,8 +568,15 @@ class MoveToStartOfFile extends MoveToLine
     if @isLinewise() then column else column + 1
 
   select: (count=1) ->
-    [{start}] = this.editor.getSelectedBufferRanges()
-    {row, column} = start
+    [{start, end}] = this.editor.getSelectedBufferRanges()
+    currentPos = @editor.getCursorBufferPosition()
+    {row, column} =
+      if start.row is currentPos.row and start.column is currentPos.column
+        end
+      else
+        start
+
+    if this.vimState.submode is 'linewise' then row++
 
     startingCol = @getStartingColumn(column)
     destinationRow = @getDestinationRow(count)
